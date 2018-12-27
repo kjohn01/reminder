@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import '../App.css';
 import { connect } from 'react-redux';
 import { addReminder } from '../actions';
 
@@ -10,15 +9,31 @@ class App extends Component {
             text: ''
         };
         this.addReminder = this.addReminder.bind(this);
+        this.renderReminders = this.renderReminders.bind(this);
     };
 
     addReminder() {
         this.props.addReminder(this.state.text);
     }
 
+    renderReminders() {
+        const { reminders } = this.props;
+        return(
+            <ul className="list-group col-sm-4">
+                {
+                    reminders.map(reminder => {
+                        return(
+                            <li key={reminder.id} className="list-group-item">
+                                <div>{reminder.text}</div>
+                            </li>
+                        );
+                    })
+                }
+            </ul>
+        );
+    }
+
     render() {
-        console.log('props', this.props);
-        
         return(
             <div className="App">
                 <div className="title">Reminder</div>
@@ -38,6 +53,7 @@ class App extends Component {
                         Add
                     </button>
                 </div>
+                { this.renderReminders() }
             </div>
         ); 
     }
@@ -49,4 +65,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, {addReminder})(App);
+export default connect(mapStateToProps, { addReminder })(App);
