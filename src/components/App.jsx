@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import '../App.css';
+import { connect } from 'react-redux';
+import { addReminder } from '../actions';
 
 class App extends Component {
     constructor(props) {
@@ -11,10 +13,12 @@ class App extends Component {
     };
 
     addReminder() {
-        console.log('this.state', this.state);
+        this.props.addReminder(this.state.text);
     }
 
     render() {
+        console.log('props', this.props);
+        
         return(
             <div className="App">
                 <div className="title">Reminder</div>
@@ -39,4 +43,10 @@ class App extends Component {
     }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    return {
+        reminders: state
+    }
+}
+
+export default connect(mapStateToProps, {addReminder})(App);
