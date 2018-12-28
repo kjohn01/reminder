@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { addReminder, deleteReminder, clearReminders } from '../actions';
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            text: ''
+            text: '',
+            dueDate: ''
         };
         this.addReminder = this.addReminder.bind(this);
-        // this.deleteReminder = this.deleteReminder.bind(this);
         this.clearReminders = this.clearReminders.bind(this);
         this.renderReminders = this.renderReminders.bind(this);
     };
 
     addReminder() {
-        this.props.addReminder(this.state.text);
+        const { text, dueDate } = this.state;
+        this.props.addReminder(text, dueDate);
     }
 
     deleteReminder(id) {
@@ -35,7 +37,8 @@ class App extends Component {
                         return(
                             <li key={reminder.id} className="list-group-item">
                                 <div className="list-item">
-                                    {reminder.text}
+                                    <div>{reminder.text}</div>
+                                    <div><em>{moment(new Date(reminder.dueDate)).fromNow()}</em></div>
                                 </div>
                                 <div onClick={() => this.deleteReminder(reminder.id)}
                                     className="list-item delete-button">
@@ -59,6 +62,10 @@ class App extends Component {
                             className="form-control" 
                             placeholder="I have to ..."
                             onChange={event => this.setState({ text: event.target.value})}
+                        />
+                        <input className="form-control"
+                            type="datetime-local"
+                            onChange={event => this.setState({ dueDate: event.target.value})}
                         />
                     </div>
                     <button 
