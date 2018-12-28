@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { addReminder } from '../actions';
+import { addReminder, deleteReminder, clearReminders } from '../actions';
 
 class App extends Component {
     constructor(props) {
@@ -9,11 +9,21 @@ class App extends Component {
             text: ''
         };
         this.addReminder = this.addReminder.bind(this);
+        // this.deleteReminder = this.deleteReminder.bind(this);
+        this.clearReminders = this.clearReminders.bind(this);
         this.renderReminders = this.renderReminders.bind(this);
     };
 
     addReminder() {
         this.props.addReminder(this.state.text);
+    }
+
+    deleteReminder(id) {
+        this.props.deleteReminder(id);
+    }
+
+    clearReminders() {
+        this.props.clearReminders();
     }
 
     renderReminders() {
@@ -24,7 +34,13 @@ class App extends Component {
                     reminders.map(reminder => {
                         return(
                             <li key={reminder.id} className="list-group-item">
-                                <div>{reminder.text}</div>
+                                <div className="list-item">
+                                    {reminder.text}
+                                </div>
+                                <div onClick={() => this.deleteReminder(reminder.id)}
+                                    className="list-item delete-button">
+                                    &#x2715;
+                                </div>
                             </li>
                         );
                     })
@@ -48,13 +64,16 @@ class App extends Component {
                     <button 
                         className="btn btn-success" 
                         type="button"
-                        onClick={() => this.addReminder()}
-                    >
+                        onClick={this.addReminder}>
                         Add
                     </button>
                 </div>
                 { this.renderReminders() }
-            </div>
+                <div className="btn btn-danger"
+                    onClick={this.clearReminders}>
+                    Clear Reminders
+                </div>
+                   </div>
         ); 
     }
 }
@@ -65,4 +84,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, { addReminder })(App);
+export default connect(mapStateToProps, { addReminder, deleteReminder, clearReminders })(App);
