@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import Task from './Task';
@@ -22,9 +21,18 @@ class App extends Component {
 
     addReminder() {
         const { text, dueDate } = this.state;
-        if (!isNonEmptyString(text)) return this.setState({ textInputError: true });
-        if (!isValidDate(dueDate)) return this.setState({ dateInputError: true });
-        this.props.addReminder(text, dueDate);
+        const textInputError = !isNonEmptyString(text);
+        const dateInputError = !isValidDate(dueDate);
+        if ( !textInputError && !dateInputError ) {
+            this.props.addReminder(text, dueDate);
+            this.setState({ 
+                text: '', 
+                dueDate: '', 
+                textInputError, 
+                dateInputError 
+            })
+        }
+        else this.setState({ textInputError, dateInputError });
     }
 
     clearReminders() {
@@ -47,7 +55,7 @@ class App extends Component {
     }
 
     render() {
-        const { textInputError, dateInputError } = this.state;
+        const { text, dueDate, textInputError, dateInputError } = this.state;
         const textInputClasses = classNames(
             'form-control', textInputError && 'error'
         );
@@ -62,17 +70,25 @@ class App extends Component {
                         <input 
                             className={textInputClasses} 
                             placeholder="I have to ..."
+                            value={text}
                             onChange={event => this.setState({ text: event.target.value})}
+                            onKeyPress={event => {
+                                if (event.key === 'Enter') this.addReminder();
+                            }}
                         />
                         {
-                            textInputError && <h5 className="red-text">What do you have to do?</h5>
+                            textInputError && <h5 className="text-danger">What do you have to do?</h5>
                         }
                         <input className={dateInputClasses}
                             type="datetime-local"
+                            value={dueDate}
                             onChange={event => this.setState({ dueDate: event.target.value})}
+                            onKeyPress={event => {
+                                if (event.key === 'Enter') this.addReminder();
+                            }}
                         />
                         {
-                            dateInputError && <h5 className="red-text">Plz select a valid due date</h5>
+                            dateInputError && <h5 className="text-danger">Plz select a valid due date</h5>
                         }
                     </div>
                     <button 
