@@ -26,3 +26,7 @@
     float: right;
     padding-left: 5px;
   }
+
+  .error, overDue {
+    border-color: red !important;
+  }

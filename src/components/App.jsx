@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
+// import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
-import moment from 'moment';
-import { addReminder, deleteReminder, clearReminders } from '../actions';
+import Task from './Task';
+import { addReminder, clearReminders } from '../actions';
+import { isNonEmptyString, isValidDate } from '../utilities';
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             text: '',
-            dueDate: ''
+            dueDate: '',
+            textInputError: false,
+            dateInputError: false
         };
         this.addReminder = this.addReminder.bind(this);
         this.clearReminders = this.clearReminders.bind(this);
@@ -17,11 +22,9 @@ class App extends Component {
 
     addReminder() {
         const { text, dueDate } = this.state;
+        if (!isNonEmptyString(text)) return this.setState({ textInputError: true });
+        if (!isValidDate(dueDate)) return this.setState({ dateInputError: true });
         this.props.addReminder(text, dueDate);
-    }
-
-    deleteReminder(id) {
-        this.props.deleteReminder(id);
     }
 
     clearReminders() {
@@ -35,16 +38,7 @@ class App extends Component {
                 {
                     reminders.map(reminder => {
                         return(
-                            <li key={reminder.id} className="list-group-item">
-                                <div className="list-item">
-                                    <div>{reminder.text}</div>
-                                    <div><em>{moment(new Date(reminder.dueDate)).fromNow()}</em></div>
-                                </div>
-                                <div onClick={() => this.deleteReminder(reminder.id)}
-                                    className="list-item delete-button">
-                                    &#x2715;
-                                </div>
-                            </li>
+                            <Task reminder={reminder} key={reminder.id} />
                         );
                     })
                 }
@@ -53,20 +47,33 @@ class App extends Component {
     }
 
     render() {
+        const { textInputError, dateInputError } = this.state;
+        const textInputClasses = classNames(
+            'form-control', textInputError && 'error'
+        );
+        const dateInputClasses = classNames(
+            'form-control', dateInputError && 'error'
+        );
         return(
             <div className="App">
                 <div className="title">Reminder</div>
                 <div className="form-inline">
                     <div className="form-group">
                         <input 
-                            className="form-control" 
+                            className={textInputClasses} 
                             placeholder="I have to ..."
                             onChange={event => this.setState({ text: event.target.value})}
                         />
-                        <input className="form-control"
+                        {
+                            textInputError && <h5 className="red-text">What do you have to do?</h5>
+                        }
+                        <input className={dateInputClasses}
                             type="datetime-local"
                             onChange={event => this.setState({ dueDate: event.target.value})}
                         />
+                        {
+                            dateInputError && <h5 className="red-text">Plz select a valid due date</h5>
+                        }
                     </div>
                     <button 
                         className="btn btn-success" 
@@ -80,7 +87,7 @@ class App extends Component {
                     onClick={this.clearReminders}>
                     Clear Reminders
                 </div>
-                   </div>
+            </div>
         ); 
     }
 }
@@ -91,4 +98,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, { addReminder, deleteReminder, clearReminders })(App);
+export default connect(mapStateToProps, { addReminder, clearReminders })(App);
